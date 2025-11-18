@@ -1,20 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>나의 첫 웹</title>
+  <title>클릭 게임</title>
   <style>
-    h1 { color: blue; }
-    button { background: green; color: white; padding: 10px; }
+    body {
+      text-align: center;
+      font-family: sans-serif;
+      margin-top: 100px;
+    }
+    button {
+      padding: 20px 40px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    #score {
+      font-size: 30px;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
-  <h1>안녕하세요!</h1>
-  <button>클릭해보세요</button>
+  <h1>클릭 게임</h1>
+  <button id="clickButton">클릭!</button>
+  <div id="score">점수: 0</div>
 
   <script>
-    document.querySelector("button").addEventListener("click", function() {
-      alert("반가워요!");
+    let score = 0;
+    const button = document.getElementById("clickButton");
+    const scoreDisplay = document.getElementById("score");
+
+    button.addEventListener("click", function() {
+      score++;
+      scoreDisplay.textContent = "점수: " + score;
     });
   </script>
 </body>
 </html>
+
