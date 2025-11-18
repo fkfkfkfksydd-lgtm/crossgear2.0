@@ -3,59 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>드래그 카드 게임 확장</title>
-  <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-family: sans-serif;
-      margin-top: 30px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 100px);
-      grid-template-rows: repeat(2, 100px);
-      gap: 10px;
-      margin-bottom: 30px;
-    }
-
-    .cell {
-      width: 100px;
-      height: 100px;
-      border: 2px dashed #aaa;
-      background-color: #f8f8f8;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .card {
-      width: 80px;
-      height: 80px;
-      background-color: #ddd;
-      border-radius: 10px;
-      overflow: hidden;
-      cursor: grab;
-      transition: transform 0.2s;
-    }
-
-    .card:active {
-      transform: scale(1.1);
-      opacity: 0.8;
-    }
-
-    .card img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    #cardZone {
-      display: flex;
-      gap: 20px;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h2>카드를 드래그해서 칸에 놓아보세요</h2>
@@ -83,32 +31,6 @@
     </div>
   </div>
 
-
-  <script>
-    function allowDrop(ev) {
-      ev.preventDefault();
-    }
-
-    function drag(ev) {
-      ev.dataTransfer.setData("text", ev.target.id);
-    }
-
-    function drop(ev) {
-      ev.preventDefault();
-      const data = ev.dataTransfer.getData("text");
-      const draggedElement = document.getElementById(data);
-
-      // 드롭 대상이 cell이고 자식이 없는 경우에만 drop 허용
-      if (ev.target.classList.contains("cell") && ev.target.children.length === 0) {
-        ev.target.appendChild(draggedElement);
-
-        // 위치 저장 - 콘솔 출력 (게임 로직에서 활용 가능)
-        const position = ev.target.getAttribute("data-position");
-        console.log(`카드 ${data}가 위치 ${position}에 배치됨`);
-      }
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
-
-
