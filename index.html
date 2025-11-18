@@ -2,151 +2,56 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>카드 뭉치에서 카드 뽑기</title>
+  <title>엑셀 기반 카드 뽑기</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
-    body {
-      font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 30px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 100px);
-      grid-template-rows: repeat(2, 100px);
-      gap: 10px;
-      margin: 30px 0;
-    }
-
-    .cell {
-      width: 100px;
-      height: 100px;
-      border: 2px dashed #aaa;
-      background-color: #f8f8f8;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .card {
-      width: 80px;
-      height: 80px;
-      background-color: #ddd;
-      border-radius: 10px;
-      overflow: hidden;
-      cursor: grab;
-      transition: transform 0.2s;
-    }
-
-    .card:active {
-      transform: scale(1.1);
-      opacity: 0.8;
-    }
-
-    .card img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    #deck {
-      border: 2px solid #555;
-      width: 100px;
-      height: 140px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      background-color: #eee;
-    }
-
-    #deck:hover {
-      background-color: #ddd;
-    }
-
-    #drawnCards {
-      display: flex;
-      gap: 20px;
-      margin-top: 20px;
-    }
+    #deck { border: 1px solid #333; padding: 10px; cursor: pointer; background: #eee; }
+    .card { width: 80px; height: 80px; margin: 10px; border: 1px solid #ccc; }
+    .card img { width: 100%; height: 100%; object-fit: cover; }
   </style>
 </head>
 <body>
-  <h2>카드를 뭉치에서 뽑아서 드래그하세요</h2>
+  <h2>엑셀에서 카드 뽑기</h2>
 
-  <!-- 카드 뭉치 -->
+  <input type="file" id="excelInput" accept=".xlsx" />
   <div id="deck">카드 뽑기</div>
-
-  <!-- 뽑힌 카드 표시 영역 -->
   <div id="drawnCards"></div>
 
-  <!-- 2x3 드롭 그리드 -->
-  <div class="grid">
-    <div class="cell" data-position="0" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-    <div class="cell" data-position="1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-    <div class="cell" data-position="2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-    <div class="cell" data-position="3" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-    <div class="cell" data-position="4" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-    <div class="cell" data-position="5" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-  </div>
-
   <script>
-    // 카드 이미지 배열 (원하는 만큼 추가 가능)
-    const cardImages = [
-      "tempcard001.png",
-      "tempcard002.png",
-      "tempcard003.png"
-    ];
+    let cardData = [];
 
-    let cardCounter = 1;
+    // 엑셀 파일 읽기
+    document.getElementById('excelInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        cardData = XLSX.utils.sheet_to_json(sheet);
+        alert("카드 데이터를 성공적으로 불러왔습니다!");
+      };
+      reader.readAsArrayBuffer(file);
+    });
 
-    document.getElementById("deck").addEventListener("click", () => {
-      if (cardImages.length === 0) {
+    // 카드 뽑기
+    document.getElementById('deck').addEventListener('click', () => {
+      if (cardData.length === 0) {
         alert("모든 카드를 다 뽑았습니다!");
         return;
       }
 
-      // 이미지 한 장 뽑기 (랜덤 또는 순차 가능)
-      const imageSrc = cardImages.shift(); // 첫 카드 뽑고 제거
-
+      const cardInfo = cardData.shift();  // 하나 뽑기
       const card = document.createElement("div");
       card.className = "card";
-      const cardId = "card" + cardCounter++;
-      card.id = cardId;
-      card.draggable = true;
-      card.ondragstart = drag;
 
       const img = document.createElement("img");
-      img.src = imageSrc;
-      img.alt = "카드 이미지";
-      img.draggable = false;
+      img.src = cardInfo.Image;  // 이미지 경로
+      img.alt = cardInfo.Name;
 
       card.appendChild(img);
-
       document.getElementById("drawnCards").appendChild(card);
     });
-
-    function allowDrop(ev) {
-      ev.preventDefault();
-    }
-
-    function drag(ev) {
-      ev.dataTransfer.setData("text", ev.target.id);
-    }
-
-    function drop(ev) {
-      ev.preventDefault();
-      const data = ev.dataTransfer.getData("text");
-      const draggedElement = document.getElementById(data);
-
-      if (ev.target.classList.contains("cell") && ev.target.children.length === 0) {
-        ev.target.appendChild(draggedElement);
-        const position = ev.target.getAttribute("data-position");
-        console.log(`카드 ${data}가 위치 ${position}에 배치됨`);
-      }
-    }
   </script>
 </body>
 </html>
